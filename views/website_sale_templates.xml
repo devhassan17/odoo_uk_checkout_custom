@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="website_sale_address_custom_fields" inherit_id="website_sale.address">
+        <!-- Replace single Name field with First Name + Last Name + hidden full name -->
+        <xpath expr="//input[@name='name']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace">
+            <div class="row g-3 uk-checkout-name-row">
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label" for="first_name">First Name</label>
+                    <input type="text"
+                           name="first_name"
+                           id="first_name"
+                           class="form-control"
+                           required="required"
+                           t-att-value="checkout.get('first_name') or (partner_sudo.x_first_name if partner_sudo else '')"/>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="col-form-label" for="last_name">Last Name</label>
+                    <input type="text"
+                           name="last_name"
+                           id="last_name"
+                           class="form-control"
+                           required="required"
+                           t-att-value="checkout.get('last_name') or (partner_sudo.x_last_name if partner_sudo else '')"/>
+                </div>
+                <input type="hidden"
+                       name="name"
+                       id="uk_hidden_full_name"
+                       t-att-value="checkout.get('name') or (partner_sudo.name if partner_sudo else '')"/>
+            </div>
+        </xpath>
+
+        <!-- Remove company field -->
+        <xpath expr="//input[@name='company_name']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace"/>
+
+        <!-- Remove VAT field -->
+        <xpath expr="//input[@name='vat']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace"/>
+
+        <!-- Remove State / Province field -->
+        <xpath expr="//select[@name='state_id']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace"/>
+
+        <!-- Phone validation and placeholder -->
+        <xpath expr="//input[@name='phone']" position="attributes">
+            <attribute name="placeholder">e.g. 07123 456789</attribute>
+            <attribute name="pattern">^(?:\+44\s?7\d{3}|0?7\d{3})\s?\d{3}\s?\d{3}$</attribute>
+            <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
+        </xpath>
+
+        <!-- Zip label -->
+        <xpath expr="//label[@for='zip']" position="replace">
+            <label class="col-form-label" for="zip">Postcode</label>
+        </xpath>
+
+        <!-- Zip/Postcode validation -->
+        <xpath expr="//input[@name='zip']" position="attributes">
+            <attribute name="placeholder">e.g. SW1A 1AA</attribute>
+            <attribute name="pattern">^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$</attribute>
+            <attribute name="title">Enter a valid UK postcode, e.g. SW1A 1AA</attribute>
+        </xpath>
+
+        <!-- Marketing opt-in checkbox after email field if present, otherwise before submit area -->
+        <xpath expr="//input[@name='email']/ancestor::div[contains(@class, 'mb-3')][1]" position="after">
+            <div class="mb-3 form-check uk-marketing-opt-in">
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="x_marketing_opt_in"
+                       name="x_marketing_opt_in"
+                       t-att-checked="'checked' if partner_sudo and partner_sudo.x_marketing_opt_in else None"/>
+                <label class="form-check-label" for="x_marketing_opt_in">
+                    I’d like to receive news, offers, and product updates by email.
+                </label>
+            </div>
+        </xpath>
+    </template>
+</odoo>

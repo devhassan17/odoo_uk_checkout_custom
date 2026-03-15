@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_uk_checkout_custom" model="ir.ui.view">
+        <field name="name">res.partner.form.uk.checkout.custom</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_first_name"/>
+                <field name="x_last_name"/>
+                <field name="x_marketing_opt_in"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
