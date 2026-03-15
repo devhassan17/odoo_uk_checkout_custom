@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="website_sale_address_custom_fields" inherit_id="website_sale.address">
+    <template id="website_sale_address_custom_fields" inherit_id="website_sale.address_form_fields">
         <!-- Replace single Name field with First Name + Last Name + hidden full name -->
-        <xpath expr="//input[@name='name']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace">
+        <xpath expr="//div[contains(@t-attf-class, 'div_name')]" position="replace">
             <div class="row g-3 uk-checkout-name-row">
                 <div class="col-md-6 mb-3">
                     <label class="col-form-label" for="first_name">First Name</label>
@@ -30,13 +30,13 @@
         </xpath>
 
         <!-- Remove company field -->
-        <xpath expr="//input[@name='company_name']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace"/>
+        <xpath expr="//div[contains(@t-attf-class, 'div_company')]" position="replace"/>
 
         <!-- Remove VAT field -->
-        <xpath expr="//input[@name='vat']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace"/>
+        <xpath expr="//div[contains(@t-attf-class, 'div_vat')]" position="replace"/>
 
         <!-- Remove State / Province field -->
-        <xpath expr="//select[@name='state_id']/ancestor::div[contains(@class, 'mb-3')][1]" position="replace"/>
+        <xpath expr="//div[contains(@t-attf-class, 'div_state')]" position="replace"/>
 
         <!-- Phone validation and placeholder -->
         <xpath expr="//input[@name='phone']" position="attributes">
@@ -58,7 +58,7 @@
         </xpath>
 
         <!-- Marketing opt-in checkbox after email field if present, otherwise before submit area -->
-        <xpath expr="//input[@name='email']/ancestor::div[contains(@class, 'mb-3')][1]" position="after">
+        <xpath expr="//div[contains(@t-attf-class, 'div_email')]" position="after">
             <div class="mb-3 form-check uk-marketing-opt-in">
                 <input type="checkbox"
                        class="form-check-input"
