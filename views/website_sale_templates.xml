@@ -40,8 +40,8 @@
         </xpath>
 
         <!-- Zip label -->
-        <xpath expr="//label[@for='zip']" position="replace">
-            <label class="col-form-label" for="zip">Postcode</label>
+        <xpath expr="//label[@for='o_zip']" position="replace" allow_multiple="1">
+            <label class="col-form-label" for="o_zip">Postcode</label>
         </xpath>
 
         <!-- Zip/Postcode validation -->
