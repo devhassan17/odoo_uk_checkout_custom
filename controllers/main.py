@@ -11,9 +11,9 @@ class WebsiteSaleCustom(WebsiteSale):
     frontend.
     """
 
-    @http.route(['/shop/address'], type='http', auth='public', website=True, sitemap=False)
-    def address(self, **kw):
-        response = super().address(**kw)
+    @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)
+    def shop_address_submit(self, **kw):
+        response = super().shop_address_submit(**kw)
 
         if request.httprequest.method == 'POST':
             order = request.website.sale_get_order()
