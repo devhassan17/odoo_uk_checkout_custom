@@ -11,7 +11,7 @@
                            id="first_name"
                            class="form-control"
                            required="required"
-                           t-att-value="checkout.get('first_name') or (partner_sudo.x_first_name if partner_sudo else '')"/>
+                           t-att-value="(checkout.get('first_name') if checkout else '') or (partner_sudo.x_first_name if partner_sudo else '')"/>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="col-form-label" for="last_name">Last Name</label>
@@ -20,12 +20,12 @@
                            id="last_name"
                            class="form-control"
                            required="required"
-                           t-att-value="checkout.get('last_name') or (partner_sudo.x_last_name if partner_sudo else '')"/>
+                           t-att-value="(checkout.get('last_name') if checkout else '') or (partner_sudo.x_last_name if partner_sudo else '')"/>
                 </div>
                 <input type="hidden"
                        name="name"
                        id="uk_hidden_full_name"
-                       t-att-value="checkout.get('name') or (partner_sudo.name if partner_sudo else '')"/>
+                       t-att-value="(checkout.get('name') if checkout else '') or (partner_sudo.name if partner_sudo else '')"/>
             </div>
         </xpath>
 

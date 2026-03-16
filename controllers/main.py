@@ -11,6 +11,16 @@ class WebsiteSaleCustom(WebsiteSale):
     frontend.
     """
 
+    @http.route(['/shop/address'], type='http', methods=['GET', 'POST'], auth='public', website=True, sitemap=False)
+    def address(self, **kw):
+        response = super().address(**kw)
+        if response.status_code == 200 and isinstance(response.qcontext, dict):
+            # In Odoo 18, 'checkout' might be missing or named 'values'.
+            # We ensure 'checkout' is available for our custom template.
+            if 'checkout' not in response.qcontext:
+                response.qcontext['checkout'] = response.qcontext.get('values', {})
+        return response
+
     @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)
     def shop_address_submit(self, **kw):
         response = super().shop_address_submit(**kw)
