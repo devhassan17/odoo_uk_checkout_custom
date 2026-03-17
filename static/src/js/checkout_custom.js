@@ -33,14 +33,16 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
 
         const postcode = this.el.querySelector('input[name="zip"]');
         const phone = this.el.querySelector('input[name="phone"]');
+        const postcodeVal = postcode ? postcode.value.trim().toUpperCase() : '';
 
-        if (postcode && postcode.value && !UK_POSTCODE_REGEX.test(postcode.value.trim())) {
+        if (postcode && postcodeVal && !UK_POSTCODE_REGEX.test(postcodeVal)) {
             postcode.setCustomValidity('Please enter a valid UK postcode, e.g. SW1A 1AA.');
             postcode.reportValidity();
             ev.preventDefault();
             return;
         } else if (postcode) {
             postcode.setCustomValidity('');
+            postcode.value = postcodeVal; // Ensure uppercase in the form
         }
 
         if (phone && phone.value && !UK_MOBILE_REGEX.test(phone.value.trim())) {

@@ -48,16 +48,17 @@
             <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
         </xpath>
 
-        <!-- Zip label -->
-        <xpath expr="//label[@for='o_zip']" position="replace" allow_multiple="1">
-            <label class="col-form-label" for="o_zip">Postcode</label>
+        <!-- Zip label: Change "Zip Code" (Odoo 18) or "Zip" to "Postcode" -->
+        <xpath expr="//label[contains(@for, 'zip')]|//label[text()='Zip Code']" position="replace">
+            <label class="col-form-label" t-att-for="kwargs.get('zip_id', 'o_zip')">Postcode</label>
         </xpath>
 
-        <!-- Zip/Postcode validation -->
+        <!-- Zip/Postcode validation: Apply to any input named zip -->
         <xpath expr="//input[@name='zip']" position="attributes">
             <attribute name="placeholder">e.g. SW1A 1AA</attribute>
-            <attribute name="pattern">^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$</attribute>
+            <attribute name="pattern">^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$</attribute>
             <attribute name="title">Enter a valid UK postcode, e.g. SW1A 1AA</attribute>
+            <attribute name="oninput">this.value = this.value.toUpperCase()</attribute>
         </xpath>
 
         <!-- Marketing opt-in checkbox after email field if present, otherwise before submit area -->
