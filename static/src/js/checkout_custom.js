@@ -17,7 +17,18 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
 
     start() {
         this._syncFullName();
+        this._fixZipLabels();
         return this._super(...arguments);
+    },
+
+    _fixZipLabels() {
+        // Enforce "Postal Code" label for any ZIP field
+        const labels = this.el.querySelectorAll('label[for="o_zip"], #div_zip label');
+        labels.forEach(label => {
+            if (label.textContent.includes('Zip')) {
+                label.textContent = 'Postal Code';
+            }
+        });
     },
 
     _onPostcodeInput(ev) {

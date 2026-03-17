@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="website_sale_address_fields_custom" inherit_id="website_sale.address_fields">
-        <!-- Zip label: Ensure "Zip Code" is replaced by "Postal Code" in the base address fields template -->
-        <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//label[contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
-            <label class="col-form-label" for="o_zip">Postal Code</label>
-        </xpath>
-    </template>
-
     <template id="website_sale_address_custom_fields" inherit_id="website_sale.address">
         <!-- Replace single Name field with First Name + Last Name + hidden full name -->
         <xpath expr="//input[@name='name']/ancestor::div[1]" position="replace">
@@ -55,8 +48,8 @@
             <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
         </xpath>
 
-        <!-- Zip label: Attempt multiple XPaths to ensure "Zip Code" is replaced by "Postal Code" -->
-        <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//div[contains(@class, 'o_website_sale_address_zip')]//label|//label[contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
+        <!-- Zip label: Use robust targeting to ensure "Zip Code" is replaced by "Postal Code" -->
+        <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//label[contains(string(), 'Zip') or contains(string(), 'ZIP')]" position="replace" allow_multiple="1">
             <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
 
@@ -91,7 +84,7 @@
         <xpath expr="//input[@name='vat']/ancestor::div[1]" position="replace"/>
 
         <!-- Zip label for B2B: Also use aggressive targeting -->
-        <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//label[contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
+        <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//label[contains(string(), 'Zip') or contains(string(), 'ZIP')]" position="replace" allow_multiple="1">
             <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
     </template>
