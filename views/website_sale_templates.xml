@@ -48,9 +48,9 @@
             <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
         </xpath>
 
-        <!-- Zip label: Use broad targeting to catch "Zip Code" or "Zip" everywhere -->
-        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip')]" position="replace" allow_multiple="1">
-            <label class="col-form-label" for="o_zip">Postcode</label>
+        <!-- Zip label: Extremely robust targeting for both Zip / Zip Code -->
+        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
+            <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
 
         <!-- Zip/Postcode validation: Apply to any input named zip -->
@@ -83,9 +83,9 @@
         <!-- Remove VAT field -->
         <xpath expr="//input[@name='vat']/ancestor::div[1]" position="replace"/>
 
-        <!-- Zip label for B2B -->
-        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip')]" position="replace" allow_multiple="1">
-            <label class="col-form-label" for="o_zip">Postcode</label>
+        <!-- Zip label for B2B: Extremely robust targeting -->
+        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
+            <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
     </template>
 </odoo>

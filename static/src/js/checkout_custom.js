@@ -24,7 +24,7 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
         const input = ev.currentTarget;
         input.value = input.value.toUpperCase();
         if (input.value && !UK_POSTCODE_REGEX.test(input.value.trim())) {
-            input.setCustomValidity('Please enter a valid UK postcode, e.g. SW1A 1AA.');
+            input.setCustomValidity('Please enter a valid UK Postal Code, e.g. SW1A 1AA.');
         } else {
             input.setCustomValidity('');
         }
@@ -47,7 +47,7 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
         const postcodeVal = postcode ? postcode.value.trim().toUpperCase() : '';
 
         if (postcode && postcodeVal && !UK_POSTCODE_REGEX.test(postcodeVal)) {
-            postcode.setCustomValidity('Please enter a valid UK postcode, e.g. SW1A 1AA.');
+            postcode.setCustomValidity('Please enter a valid UK Postal Code, e.g. SW1A 1AA.');
             postcode.reportValidity();
             ev.preventDefault();
             return;
