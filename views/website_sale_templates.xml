@@ -48,8 +48,8 @@
             <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
         </xpath>
 
-        <!-- Zip label: Change "Zip Code" (Odoo 18) or "Zip" to "Postcode" -->
-        <xpath expr="//label[contains(@for, 'zip')]|//label[text()='Zip Code']" position="replace">
+        <!-- Zip label: Use broad targeting to catch "Zip Code" or "Zip" everywhere -->
+        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip')]" position="replace" allow_multiple="1">
             <label class="col-form-label" t-att-for="kwargs.get('zip_id', 'o_zip')">Postcode</label>
         </xpath>
 
@@ -82,5 +82,10 @@
 
         <!-- Remove VAT field -->
         <xpath expr="//input[@name='vat']/ancestor::div[1]" position="replace"/>
+
+        <!-- Zip label for B2B -->
+        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip')]" position="replace" allow_multiple="1">
+            <label class="col-form-label" t-att-for="kwargs.get('zip_id', 'o_zip')">Postcode</label>
+        </xpath>
     </template>
 </odoo>
