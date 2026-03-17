@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <template id="website_sale_address_fields_custom" inherit_id="website_sale.address_fields">
+        <!-- Zip label: Ensure "Zip Code" is replaced by "Postal Code" in the base address fields template -->
+        <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//label[contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
+            <label class="col-form-label" for="o_zip">Postal Code</label>
+        </xpath>
+    </template>
+
     <template id="website_sale_address_custom_fields" inherit_id="website_sale.address">
         <!-- Replace single Name field with First Name + Last Name + hidden full name -->
         <xpath expr="//input[@name='name']/ancestor::div[1]" position="replace">
