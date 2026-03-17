@@ -2,7 +2,7 @@
 
 import publicWidget from '@web/legacy/js/public/public_widget';
 
-const UK_POSTCODE_REGEX = /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$/;
+const UK_POSTCODE_REGEX = /^[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}$/i;
 const UK_MOBILE_REGEX = /^(?:\+44\s?7\d{3}|0?7\d{3})\s?\d{3}\s?\d{3}$/;
 
 publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
@@ -11,12 +11,23 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
     events: {
         'input #first_name': '_syncFullName',
         'input #last_name': '_syncFullName',
+        'input input[name="zip"]': '_onPostcodeInput',
         'submit': '_onSubmit',
     },
 
     start() {
         this._syncFullName();
         return this._super(...arguments);
+    },
+
+    _onPostcodeInput(ev) {
+        const input = ev.currentTarget;
+        input.value = input.value.toUpperCase();
+        if (input.value && !UK_POSTCODE_REGEX.test(input.value.trim())) {
+            input.setCustomValidity('Please enter a valid UK postcode, e.g. SW1A 1AA.');
+        } else {
+            input.setCustomValidity('');
+        }
     },
 
     _syncFullName() {
