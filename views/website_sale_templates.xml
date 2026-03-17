@@ -48,8 +48,8 @@
             <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
         </xpath>
 
-        <!-- Zip label: Extremely robust targeting for both Zip / Zip Code -->
-        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
+        <!-- Zip label: The most aggressive targeting possible to ensure it changes to Postal Code -->
+        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip') or contains(text(), 'ZIP') or @for='zip']" position="replace" allow_multiple="1">
             <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
 
@@ -83,8 +83,8 @@
         <!-- Remove VAT field -->
         <xpath expr="//input[@name='vat']/ancestor::div[1]" position="replace"/>
 
-        <!-- Zip label for B2B: Extremely robust targeting -->
-        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip') or contains(text(), 'ZIP')]" position="replace" allow_multiple="1">
+        <!-- Zip label for B2B: The most aggressive targeting possible -->
+        <xpath expr="//label[contains(@for, 'zip') or contains(text(), 'Zip') or contains(text(), 'ZIP') or @for='zip']" position="replace" allow_multiple="1">
             <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
     </template>
