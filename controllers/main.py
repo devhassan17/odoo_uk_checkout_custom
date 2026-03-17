@@ -19,6 +19,11 @@ class WebsiteSaleCustom(WebsiteSale):
             # We ensure 'checkout' is available for our custom template.
             if 'checkout' not in response.qcontext:
                 response.qcontext['checkout'] = response.qcontext.get('values', {})
+
+            # Restrict countries to UK only
+            countries = response.qcontext.get('countries')
+            if countries:
+                response.qcontext['countries'] = countries.filtered(lambda c: c.code == 'GB')
         return response
 
     @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)

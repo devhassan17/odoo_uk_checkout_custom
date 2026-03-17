@@ -29,8 +29,17 @@
             </div>
         </xpath>
 
-        <!-- Remove State / Province field -->
-        <xpath expr="//select[@name='state_id']/ancestor::div[1]" position="replace"/>
+        <!-- Hide State / Province field using d-none instead of replace to avoid JS errors -->
+        <xpath expr="//select[@name='state_id']/ancestor::div[1]" position="attributes">
+            <attribute name="class" add="d-none" separator=" "/>
+        </xpath>
+
+        <!-- Lock Country field to United Kingdom -->
+        <xpath expr="//select[@name='country_id']" position="attributes">
+            <attribute name="readonly">1</attribute>
+            <attribute name="style">pointer-events: none; background-color: #e9ecef;</attribute>
+            <attribute name="title">Shipping is currently only available to the United Kingdom.</attribute>
+        </xpath>
 
         <!-- Phone validation and placeholder -->
         <xpath expr="//input[@name='phone']" position="attributes">
