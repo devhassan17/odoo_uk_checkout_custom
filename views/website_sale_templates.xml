@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="website_sale_address_custom_fields" inherit_id="website_sale.address">
-        <!-- Replace single Name field with First Name + Last Name + hidden full name -->
-        <xpath expr="//input[@name='name']/ancestor::div[1]" position="replace">
+    <template id="website_sale_address_form_fields_custom" inherit_id="website_sale.address_form_fields">
+        <!-- 1. Replace Name field with First/Last Name -->
+        <xpath expr="//div[@id='div_name']" position="replace">
             <div class="row g-3 uk-checkout-name-row">
                 <div class="col-md-6 mb-2">
                     <label class="col-form-label" for="first_name">First Name</label>
@@ -29,31 +29,20 @@
             </div>
         </xpath>
 
-        <!-- Hide State / Province field using d-none instead of replace to avoid JS errors -->
-        <xpath expr="//select[@name='state_id']/ancestor::div[1]" position="attributes">
-            <attribute name="class" add="d-none" separator=" "/>
-        </xpath>
+        <!-- 2. Remove B2B fields (Company and VAT) -->
+        <xpath expr="//t[@name='b2b_fields']" position="replace"/>
 
-        <!-- Lock Country field to United Kingdom with professional styling -->
-        <xpath expr="//select[@name='country_id']" position="attributes">
-            <attribute name="readonly">1</attribute>
-            <attribute name="class" add="uk-readonly-field" separator=" "/>
-            <attribute name="title">Shipping is currently only available to the United Kingdom.</attribute>
-        </xpath>
-
-        <!-- Phone validation and placeholder -->
+        <!-- 3. Phone validation and layout -->
         <xpath expr="//input[@name='phone']" position="attributes">
             <attribute name="placeholder">e.g. 07123 456789</attribute>
             <attribute name="pattern">^(?:\+44\s?7\d{3}|0?7\d{3})\s?\d{3}\s?\d{3}$</attribute>
             <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
         </xpath>
 
-        <!-- Zip label: Use robust targeting to ensure "Zip Code" is replaced by "Postal Code" -->
+        <!-- 4. Zip label and validation -->
         <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//label[contains(string(), 'Zip') or contains(string(), 'ZIP')]" position="replace" allow_multiple="1">
             <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
-
-        <!-- Zip/Postcode validation and layout -->
         <xpath expr="//input[@name='zip']" position="attributes">
             <attribute name="placeholder">e.g. SW1A 1AA</attribute>
             <attribute name="pattern">^[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}$</attribute>
@@ -61,8 +50,20 @@
             <attribute name="oninput">this.value = this.value.toUpperCase()</attribute>
         </xpath>
 
-        <!-- Marketing opt-in checkbox after email field if present, otherwise before submit area -->
-        <xpath expr="//input[@name='email']/ancestor::div[1]" position="after">
+        <!-- 5. Lock Country field to United Kingdom -->
+        <xpath expr="//select[@name='country_id']" position="attributes">
+            <attribute name="readonly">1</attribute>
+            <attribute name="class" add="uk-readonly-field" separator=" "/>
+            <attribute name="title">Shipping is currently only available to the United Kingdom.</attribute>
+        </xpath>
+
+        <!-- 6. Hide State / Province field -->
+        <xpath expr="//div[@id='div_state']" position="attributes">
+            <attribute name="class" add="d-none" separator=" "/>
+        </xpath>
+
+        <!-- 7. Marketing opt-in checkbox after email field -->
+        <xpath expr="//div[@id='div_email']" position="after">
             <div class="mb-3 form-check uk-marketing-opt-in">
                 <input type="checkbox"
                        class="form-check-input"
@@ -73,19 +74,6 @@
                     I’d like to receive news, offers, and product updates by email.
                 </label>
             </div>
-        </xpath>
-    </template>
-
-    <template id="website_sale_address_b2b_custom_fields" inherit_id="website_sale.address_b2b">
-        <!-- Remove company field -->
-        <xpath expr="//input[@name='company_name']/ancestor::div[1]" position="replace"/>
-
-        <!-- Remove VAT field -->
-        <xpath expr="//input[@name='vat']/ancestor::div[1]" position="replace"/>
-
-        <!-- Zip label for B2B: Also use aggressive targeting -->
-        <xpath expr="//label[@for='o_zip']|//div[@id='div_zip']//label|//label[contains(string(), 'Zip') or contains(string(), 'ZIP')]" position="replace" allow_multiple="1">
-            <label class="col-form-label" for="o_zip">Postal Code</label>
         </xpath>
     </template>
 </odoo>
