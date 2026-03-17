@@ -20,10 +20,14 @@ class WebsiteSaleCustom(WebsiteSale):
             if 'checkout' not in response.qcontext:
                 response.qcontext['checkout'] = response.qcontext.get('values', {})
 
-            # Restrict countries to UK only
+            # Restrict countries to UK only and ensure UK is the default selected country
             countries = response.qcontext.get('countries')
             if countries:
-                response.qcontext['countries'] = countries.filtered(lambda c: c.code == 'GB')
+                uk_country = countries.filtered(lambda c: c.code == 'GB')
+                response.qcontext['countries'] = uk_country
+                # Also ensure the 'country' variable (current selection) defaults to UK
+                if not response.qcontext.get('country') or response.qcontext['country'].code != 'GB':
+                    response.qcontext['country'] = uk_country[:1]
         return response
 
     @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)
