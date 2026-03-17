@@ -1,6 +1,6 @@
 {
     'name': 'UK Checkout Customisations',
-    'version': '18.0.2.1.0',
+    'version': '18.0.2.2.0',
     'summary': 'Custom checkout changes for UK D2C stores',
     'description': """
 Adds custom-only checkout features for UK D2C stores:
@@ -25,6 +25,7 @@ Not included because they are better handled by settings or third-party apps:
     ],
     'assets': {
         'web.assets_frontend': [
+            'odoo_uk_checkout_custom/static/src/css/checkout_custom.css',
             'odoo_uk_checkout_custom/static/src/js/checkout_custom.js',
         ],
     },

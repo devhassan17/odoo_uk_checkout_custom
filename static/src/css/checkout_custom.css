@@ -1,0 +1,39 @@
+/* Custom Checkout Styles for UK Store */
+
+.uk-checkout-name-row {
+    margin-bottom: 0.5rem;
+}
+
+.uk-checkout-name-row .col-form-label {
+    font-weight: 500;
+}
+
+/* Professional look for the locked Country selector */
+#o_country_id.uk-readonly-field {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #6c757d !important;
+    cursor: default;
+    pointer-events: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: none !important; /* Hide the dropdown arrow to signal readonly */
+}
+
+/* Ensure consistent spacing for marketing opt-in */
+.uk-marketing-opt-in {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+}
+
+.uk-marketing-opt-in .form-check-label {
+    font-size: 0.9rem;
+    color: #495057;
+    cursor: pointer;
+}
+
+/* Clean up transitions */
+.form-control, .form-select {
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}

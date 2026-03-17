@@ -4,7 +4,7 @@
         <!-- Replace single Name field with First Name + Last Name + hidden full name -->
         <xpath expr="//input[@name='name']/ancestor::div[1]" position="replace">
             <div class="row g-3 uk-checkout-name-row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-2">
                     <label class="col-form-label" for="first_name">First Name</label>
                     <input type="text"
                            name="first_name"
@@ -13,7 +13,7 @@
                            required="required"
                            t-att-value="(checkout.get('first_name') if checkout else '') or (partner_sudo.x_first_name if partner_sudo else '')"/>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-2">
                     <label class="col-form-label" for="last_name">Last Name</label>
                     <input type="text"
                            name="last_name"
@@ -34,10 +34,10 @@
             <attribute name="class" add="d-none" separator=" "/>
         </xpath>
 
-        <!-- Lock Country field to United Kingdom -->
+        <!-- Lock Country field to United Kingdom with professional styling -->
         <xpath expr="//select[@name='country_id']" position="attributes">
             <attribute name="readonly">1</attribute>
-            <attribute name="style">pointer-events: none; background-color: #e9ecef;</attribute>
+            <attribute name="class" add="uk-readonly-field" separator=" "/>
             <attribute name="title">Shipping is currently only available to the United Kingdom.</attribute>
         </xpath>
 
