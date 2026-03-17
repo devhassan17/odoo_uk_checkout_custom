@@ -1,6 +1,6 @@
 {
     'name': 'UK Checkout Customisations',
-    'version': '18.0.1.6.0',
+    'version': '18.0.1.7.0',
     'summary': 'Custom checkout changes for UK D2C stores',
     'description': """
 Adds custom-only checkout features for UK D2C stores:
@@ -15,7 +15,7 @@ Not included because they are better handled by settings or third-party apps:
 - Restrict shipping to UK only (configure delivery methods)
 - One-page / one-step checkout
 """,
-    'author': 'Ali Hassan',
+    'author': 'Ali Hassan (Managemyweb)',
     'license': 'LGPL-3',
     'category': 'Website/eCommerce',
     'depends': ['website_sale', 'contacts', 'mail'],
