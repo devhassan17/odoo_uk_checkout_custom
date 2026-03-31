@@ -15,7 +15,7 @@ Not included because they are better handled by settings or third-party apps:
 - Restrict shipping to UK only (configure delivery methods)
 - One-page / one-step checkout
 """,
-    'author': 'Ali Hassan (Managemyweb)',
+    'author': 'Managemyweb.co',
     'license': 'LGPL-3',
     'category': 'Website/eCommerce',
     'depends': ['website_sale', 'contacts', 'mail'],
