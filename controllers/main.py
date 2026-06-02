@@ -35,7 +35,7 @@ class WebsiteSaleCustom(WebsiteSale):
         response = super().shop_address_submit(**kw)
 
         if request.httprequest.method == 'POST':
-            order = request.website.sale_get_order()
+            order = request.cart
             partner = order.partner_invoice_id or order.partner_id
             if partner:
                 first_name = (kw.get('first_name') or '').strip()

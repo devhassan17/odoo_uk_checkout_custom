@@ -35,8 +35,8 @@
         <!-- 3. Phone validation and layout -->
         <xpath expr="//input[@name='phone']" position="attributes">
             <attribute name="placeholder">e.g. 07123 456789</attribute>
-            <attribute name="pattern">^(?:\+44\s?7\d{3}|0?7\d{3})\s?\d{3}\s?\d{3}$</attribute>
-            <attribute name="title">Enter a valid UK mobile number, e.g. 07123 456789 or +44 7123 456789</attribute>
+            <attribute name="pattern">^(?:\+44\s?|0)\s*(?:\d\s*){9,10}$</attribute>
+            <attribute name="title">Enter a valid UK phone number, e.g. 07123 456789 or +44 20 7123 4567</attribute>
         </xpath>
 
         <!-- 4. Zip label and validation -->
