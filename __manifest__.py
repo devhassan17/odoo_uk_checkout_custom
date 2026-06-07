@@ -22,7 +22,6 @@ Not included because they are better handled by settings or third-party apps:
     'data': [
         'views/res_partner_views.xml',
         'views/website_sale_templates.xml',
-        'views/website_layout_fix.xml',
     ],
     'assets': {
         'web.assets_frontend': [
