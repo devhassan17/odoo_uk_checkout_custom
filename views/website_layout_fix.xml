@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Fix: replace request.env.user.mobile with request.env.user.partner_id.mobile
+         because res.users does not expose 'mobile' by default -->
+    <template id="website_layout_mobile_fix" inherit_id="website.layout">
+        <xpath expr="//t[@t-esc='request.env.user.phone or request.env.user.mobile or &apos;&apos;']" position="replace">
+            <t t-esc="request.env.user.phone or request.env.user.partner_id.mobile or ''"/>
+        </xpath>
+    </template>
+</odoo>
