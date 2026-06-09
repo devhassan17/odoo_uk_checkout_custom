@@ -69,7 +69,7 @@
                        class="form-check-input"
                        id="x_marketing_opt_in"
                        name="x_marketing_opt_in"
-                       t-att-checked="'checked' if partner_sudo and partner_sudo.x_marketing_opt_in else None"/>
+                       t-att-checked="'checked' if (not partner_sudo or partner_sudo.id == request.website.user_id.sudo().partner_id.id or partner_sudo.x_marketing_opt_in) else None"/>
                 <label class="form-check-label" for="x_marketing_opt_in">
                     I’d like to receive news, offers, and product updates by email.
                 </label>

@@ -1,6 +1,9 @@
+import logging
 from odoo import http
 from odoo.http import request
 from odoo.addons.website_sale.controllers.main import WebsiteSale
+
+_logger = logging.getLogger(__name__)
 
 
 class WebsiteSaleCustom(WebsiteSale):
@@ -57,5 +60,23 @@ class WebsiteSaleCustom(WebsiteSale):
                     # Keep shipping and invoice partners aligned when they are the same customer profile.
                     related_partners = (order.partner_id | order.partner_invoice_id | order.partner_shipping_id).exists()
                     related_partners.sudo().write(vals)
+
+                # Enqueue and immediately dispatch 'Started Checkout' event to Klaviyo.
+                if order and order.order_line:
+                    event_queue = request.env['fpg.odoo.klaviyo.integration.event.queue'].sudo()
+                    existing_checkout = event_queue.search([
+                        ('order_id', '=', order.id),
+                        ('event_type', '=', 'started_checkout')
+                    ], limit=1)
+                    if not existing_checkout:
+                        try:
+                            with request.env.cr.savepoint():
+                                new_event = event_queue.create({
+                                    'order_id': order.id,
+                                    'event_type': 'started_checkout',
+                                })
+                                new_event.send_event()
+                        except Exception as e:
+                            _logger.exception("Klaviyo: Failed to create or send Started Checkout event: %s", e)
 
         return response
