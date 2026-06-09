@@ -1,6 +1,8 @@
 import logging
+import traceback
 from odoo import http
 from odoo.http import request
+from odoo.exceptions import UserError
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 _logger = logging.getLogger(__name__)
@@ -13,6 +15,24 @@ class WebsiteSaleCustom(WebsiteSale):
     then updating the created/edited partner with the extra fields we collect on the
     frontend.
     """
+
+    @http.route(['/shop/cart/update'], type='http', auth="public", methods=['POST'], website=True, csrf=False)
+    def cart_update(self, *args, **kwargs):
+        try:
+            return super().cart_update(*args, **kwargs)
+        except Exception as e:
+            tb = traceback.format_exc()
+            _logger.error("Klaviyo Debug: %s", tb)
+            raise UserError("Klaviyo Debug Traceback:\n%s" % tb)
+
+    @http.route(['/shop/cart/update_json'], type='json', auth="public", methods=['POST'], website=True, csrf=False)
+    def cart_update_json(self, *args, **kwargs):
+        try:
+            return super().cart_update_json(*args, **kwargs)
+        except Exception as e:
+            tb = traceback.format_exc()
+            _logger.error("Klaviyo Debug: %s", tb)
+            raise UserError("Klaviyo Debug Traceback:\n%s" % tb)
 
     @http.route(['/shop/address'], type='http', methods=['GET'], auth='public', website=True, sitemap=False)
     def shop_address(self, **kw):
