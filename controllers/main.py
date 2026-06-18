@@ -55,10 +55,8 @@ class WebsiteSaleCustom(WebsiteSale):
                     if not current_country or current_country not in allowed_countries:
                         response.qcontext['country'] = allowed_countries[:1]
                 else:
-                    uk_country = countries.filtered(lambda c: c.code == 'GB')
-                    response.qcontext['countries'] = uk_country
-                    if not response.qcontext.get('country') or response.qcontext['country'].code != 'GB':
-                        response.qcontext['country'] = uk_country[:1]
+                    # If no allowed countries are configured for this company, show all countries
+                    pass
         return response
 
     @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)
