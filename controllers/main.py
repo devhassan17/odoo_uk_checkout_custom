@@ -43,14 +43,22 @@ class WebsiteSaleCustom(WebsiteSale):
             if 'checkout' not in response.qcontext:
                 response.qcontext['checkout'] = response.qcontext.get('values', {})
 
-            # Restrict countries to UK only and ensure UK is the default selected country
+            # Restrict countries based on active company configuration, falling back to UK
             countries = response.qcontext.get('countries')
             if countries:
-                uk_country = countries.filtered(lambda c: c.code == 'GB')
-                response.qcontext['countries'] = uk_country
-                # Also ensure the 'country' variable (current selection) defaults to UK
-                if not response.qcontext.get('country') or response.qcontext['country'].code != 'GB':
-                    response.qcontext['country'] = uk_country[:1]
+                company = request.website.company_id or request.env.company
+                if company and hasattr(company, 'x_checkout_country_ids') and company.x_checkout_country_ids:
+                    allowed_countries = countries & company.x_checkout_country_ids
+                    response.qcontext['countries'] = allowed_countries
+                    # Ensure selection defaults to one of the allowed countries
+                    current_country = response.qcontext.get('country')
+                    if not current_country or current_country not in allowed_countries:
+                        response.qcontext['country'] = allowed_countries[:1]
+                else:
+                    uk_country = countries.filtered(lambda c: c.code == 'GB')
+                    response.qcontext['countries'] = uk_country
+                    if not response.qcontext.get('country') or response.qcontext['country'].code != 'GB':
+                        response.qcontext['country'] = uk_country[:1]
         return response
 
     @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)

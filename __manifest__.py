@@ -1,6 +1,6 @@
 {
     'name': 'UK Checkout Customisations',
-    'version': '19.0.1.2.1',
+    'version': '19.0.1.2.3',
     'summary': 'Custom checkout changes for UK D2C stores',
     'description': """
 Adds custom-only checkout features for UK D2C stores:
@@ -22,6 +22,7 @@ Not included because they are better handled by settings or third-party apps:
     'data': [
         'views/res_partner_views.xml',
         'views/website_sale_templates.xml',
+        'views/res_config_settings_views.xml',
     ],
     'assets': {
         'web.assets_frontend': [
