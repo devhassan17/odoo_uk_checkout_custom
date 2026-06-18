@@ -1,39 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Settings form inheritance to expose the country filter field -->
-    <record id="res_config_settings_view_form" model="ir.ui.view">
-        <field name="name">res.config.settings.view.form.inherit.uk.checkout.custom</field>
-        <field name="model">res.config.settings</field>
-        <field name="priority" eval="100"/>
-        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//form" position="inside">
-                <app string="UK Checkout Settings" name="odoo_uk_checkout_custom">
-                    <block title="General Checkout Settings" name="uk_checkout_general_block">
-                        <div class="row mt16 o_settings_container">
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane"/>
-                                <div class="o_setting_right_pane">
-                                    <label for="company_id" string="Active Company"/>
-                                    <div class="text-muted">Select the Odoo company you are currently configuring.</div>
-                                    <field name="company_id" options="{'no_create': True, 'no_open': True}"/>
-                                </div>
-                            </div>
-                            <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane"/>
-                                <div class="o_setting_right_pane">
-                                    <label for="x_checkout_country_ids"/>
-                                    <div class="text-muted">Restrict website checkout to only these countries for the active company. Leave empty to default to United Kingdom only.</div>
-                                    <field name="x_checkout_country_ids" widget="many2many_tags" placeholder="Select countries..."/>
-                                </div>
-                            </div>
-                        </div>
-                    </block>
-                </app>
-            </xpath>
-        </field>
-    </record>
 
     <!-- Company Checkout Filters Page Views & Window Action -->
     <record id="uk_res_company_checkout_filter_view_list" model="ir.ui.view">
