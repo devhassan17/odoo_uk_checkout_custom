@@ -1,6 +1,6 @@
 {
     'name': 'UK Checkout Customisations',
-    'version': '19.0.1.2.4',
+    'version': '19.0.1.2.5',
     'summary': 'Custom checkout changes for UK D2C stores',
     'description': """
 Adds custom-only checkout features for UK D2C stores:
