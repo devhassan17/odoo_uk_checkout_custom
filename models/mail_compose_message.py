@@ -15,12 +15,9 @@ class MailComposeMessage(models.TransientModel):
             if self.env.company.helpdesk_force_team_email:
                 ticket_id = self.env.context.get('active_ids')[0]
                 ticket = self.env['helpdesk.ticket'].browse(ticket_id)
-                if ticket.exists() and ticket.team_id and ticket.team_id.alias_email:
-                    # Update email_from
-                    alias_name_email = ticket.team_id.alias_email
-                    team_name = ticket.team_id.name
-                    formatted_email = formataddr((team_name, alias_name_email))
-                    
-                    res['email_from'] = formatted_email
-                    
+                if ticket.exists():
+                    reply_to = ticket._notify_get_reply_to(default=None)[ticket.id]
+                    if reply_to:
+                        res['email_from'] = reply_to
+
         return res
