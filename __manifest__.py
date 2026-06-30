@@ -1,6 +1,6 @@
 {
     'name': 'UK Checkout Customisations',
-    'version': '19.0.1.2.6',
+    'version': '19.0.1.2.7',
     'summary': 'Custom checkout changes for UK D2C stores',
     'description': """
 Adds custom-only checkout features for UK D2C stores:
@@ -18,7 +18,7 @@ Not included because they are better handled by settings or third-party apps:
     'author': 'Managemyweb.co',
     'license': 'LGPL-3',
     'category': 'Website/eCommerce',
-    'depends': ['website_sale', 'contacts', 'mail'],
+    'depends': ['website_sale', 'contacts', 'mail', 'helpdesk'],
     'data': [
         'views/res_partner_views.xml',
         'views/website_sale_templates.xml',
