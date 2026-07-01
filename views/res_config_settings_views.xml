@@ -41,7 +41,6 @@
                     <group>
                         <group>
                             <field name="x_checkout_country_ids" widget="many2many_tags" placeholder="Select allowed countries..."/>
-                            <field name="helpdesk_force_team_email" widget="boolean_toggle"/>
                         </group>
                     </group>
                 </sheet>
