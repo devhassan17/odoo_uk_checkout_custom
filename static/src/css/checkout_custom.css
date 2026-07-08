@@ -38,16 +38,9 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* Hide "Same as delivery address" switch on checkout */
-#use_same, 
-label[for="use_same"],
-.form-check:has(#use_same),
-.form-switch:has(#use_same),
-.form-check:has(input[name="use_same"]),
-.form-switch:has(input[name="use_same"]),
-.form-check:has(input[name="use_billing"]),
-.form-switch:has(input[name="use_billing"]),
-.form-check:has(input[name="use_delivery_as_billing"]),
-.form-switch:has(input[name="use_delivery_as_billing"]) {
-    display: none !important;
+/* Inline Billing Form styling */
+#uk_inline_billing_form {
+    border-color: #dee2e6 !important;
+    background-color: #f8f9fa !important;
+    transition: all 0.3s ease-in-out;
 }

@@ -55,6 +55,11 @@
             <attribute name="class" add="d-none" separator=" "/>
         </xpath>
 
+        <!-- 6b. Clear placeholder for main phone field -->
+        <xpath expr="//input[@name='phone']" position="attributes">
+            <attribute name="placeholder"></attribute>
+        </xpath>
+
         <!-- 7. Marketing opt-in checkbox after email field -->
         <xpath expr="//div[@id='div_email']" position="after">
             <div class="mb-3 form-check uk-marketing-opt-in">
