@@ -66,12 +66,12 @@ class WebsiteSaleCustom(WebsiteSale):
         if request.httprequest.method == 'POST':
             order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
             if order:
+                address_type = kw.get('address_type')
                 # Determine which partner was just updated or created (this is the billing/main address)
                 partner_id = int(kw.get('partner_id') or 0)
                 if partner_id > 0:
                     partner = request.env['res.partner'].sudo().browse(partner_id)
                 else:
-                    address_type = kw.get('address_type')
                     if address_type == 'shipping':
                         partner = order.partner_shipping_id
                     else:
