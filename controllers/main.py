@@ -128,7 +128,8 @@ class WebsiteSaleCustom(WebsiteSale):
 
                             # Check if a separate shipping partner already exists on the order
                             existing_shipping = order.partner_shipping_id
-                            if existing_shipping and existing_shipping.id != partner.id:
+                            public_partner = request.website.user_id.sudo().partner_id
+                            if existing_shipping and existing_shipping.id != partner.id and existing_shipping.id != public_partner.id:
                                 existing_shipping.sudo().write(shipping_vals)
                             else:
                                 # Create new child partner for delivery
