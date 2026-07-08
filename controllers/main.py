@@ -65,8 +65,19 @@ class WebsiteSaleCustom(WebsiteSale):
 
         if request.httprequest.method == 'POST':
             order = request.cart
-            partner = order.partner_invoice_id or order.partner_id
-            if partner:
+            
+            # Determine which partner was just updated or created
+            partner_id = int(kw.get('partner_id') or 0)
+            if partner_id > 0:
+                partner = request.env['res.partner'].sudo().browse(partner_id)
+            else:
+                address_type = kw.get('address_type')
+                if address_type == 'shipping':
+                    partner = order.partner_shipping_id
+                else:
+                    partner = order.partner_invoice_id or order.partner_id
+
+            if partner and partner.exists():
                 first_name = (kw.get('first_name') or '').strip()
                 last_name = (kw.get('last_name') or '').strip()
                 marketing_opt_in = kw.get('x_marketing_opt_in') in ('on', 'true', '1', 'yes')
@@ -83,9 +94,7 @@ class WebsiteSaleCustom(WebsiteSale):
                     vals['x_marketing_opt_in'] = marketing_opt_in
 
                 if vals:
-                    # Keep shipping and invoice partners aligned when they are the same customer profile.
-                    related_partners = (order.partner_id | order.partner_invoice_id | order.partner_shipping_id).exists()
-                    related_partners.sudo().write(vals)
+                    partner.sudo().write(vals)
 
                 # Enqueue and immediately dispatch 'Started Checkout' event to Klaviyo.
                 if order and order.order_line:

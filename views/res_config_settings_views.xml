@@ -1,5 +1,13 @@
 <odoo>
 
+    <!-- Enable both billing and shipping addresses by default (Extra Address Step) -->
+    <record id="base.group_portal" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('website_sale.group_delivery_addresses'))]"/>
+    </record>
+    <record id="base.group_public" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('website_sale.group_delivery_addresses'))]"/>
+    </record>
+
     <!-- Overwrite old settings view in DB to be empty to clean up the UI -->
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.uk.checkout.custom</field>
