@@ -83,7 +83,7 @@
                        class="form-check-input"
                        id="use_different_shipping"
                        name="use_different_shipping"
-                       t-att-checked="'checked' if order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id else None"/>
+                       t-att-checked="'checked' if website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id else None"/>
                 <label class="form-check-label fw-bold text-primary" for="use_different_shipping">
                     Ship to a different address
                 </label>
@@ -101,7 +101,7 @@
                                name="shipping_first_name"
                                id="shipping_first_name"
                                class="form-control"
-                               t-att-value="order.partner_shipping_id.x_first_name if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                               t-att-value="website_sale_order.partner_shipping_id.x_first_name if (website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id) else ''"/>
                     </div>
                     <div class="col-md-6">
                         <label class="col-form-label" for="shipping_last_name">Last Name</label>
@@ -109,7 +109,7 @@
                                name="shipping_last_name"
                                id="shipping_last_name"
                                class="form-control"
-                               t-att-value="order.partner_shipping_id.x_last_name if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                               t-att-value="website_sale_order.partner_shipping_id.x_last_name if (website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id) else ''"/>
                     </div>
                 </div>
 
@@ -121,7 +121,7 @@
                            id="shipping_phone"
                            class="form-control"
                            placeholder="e.g. +44 7123 456789 or 07123 456789"
-                           t-att-value="order.partner_shipping_id.phone if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                           t-att-value="website_sale_order.partner_shipping_id.phone if (website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id) else ''"/>
                 </div>
 
                 <!-- Street and Number -->
@@ -131,7 +131,7 @@
                            name="shipping_street"
                            id="shipping_street"
                            class="form-control"
-                           t-att-value="order.partner_shipping_id.street if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                           t-att-value="website_sale_order.partner_shipping_id.street if (website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id) else ''"/>
                 </div>
 
                 <!-- Apartment, suite, etc. -->
@@ -141,7 +141,7 @@
                            name="shipping_street2"
                            id="shipping_street2"
                            class="form-control"
-                           t-att-value="order.partner_shipping_id.street2 if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                           t-att-value="website_sale_order.partner_shipping_id.street2 if (website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id) else ''"/>
                 </div>
 
                 <!-- Row for City & Postal Code -->
@@ -152,7 +152,7 @@
                                name="shipping_city"
                                id="shipping_city"
                                class="form-control"
-                               t-att-value="order.partner_shipping_id.city if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                               t-att-value="website_sale_order.partner_shipping_id.city if (website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id) else ''"/>
                     </div>
                     <div class="col-md-6">
                         <label class="col-form-label" for="shipping_zip">Postal Code</label>
@@ -163,7 +163,7 @@
                                placeholder="e.g. SW1A 1AA"
                                style="text-transform: uppercase;"
                                oninput="this.value = this.value.toUpperCase()"
-                               t-att-value="order.partner_shipping_id.zip if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                               t-att-value="website_sale_order.partner_shipping_id.zip if (website_sale_order.partner_shipping_id and website_sale_order.partner_shipping_id.id != website_sale_order.partner_id.id) else ''"/>
                     </div>
                 </div>
 
