@@ -11,12 +11,14 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
         'input #first_name': '_syncFullName',
         'input #last_name': '_syncFullName',
         'input input[name="zip"]': '_onPostcodeInput',
+        'change #use_different_shipping': '_onToggleShipping',
         'submit': '_onSubmit',
     },
 
     start() {
         this._syncFullName();
         this._fixZipLabels();
+        this._onToggleShipping();
         return this._super(...arguments);
     },
 
@@ -49,6 +51,38 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
         }
     },
 
+    _onToggleShipping() {
+        const checkbox = this.el.querySelector('#use_different_shipping');
+        const container = this.el.querySelector('#shipping_address_fields');
+        if (!checkbox || !container) return;
+
+        const isChecked = checkbox.checked;
+        if (isChecked) {
+            container.classList.remove('d-none');
+        } else {
+            container.classList.add('d-none');
+        }
+
+        // Toggle required attribute on shipping fields
+        const requiredFields = [
+            '#shipping_first_name',
+            '#shipping_last_name',
+            '#shipping_street',
+            '#shipping_city',
+            '#shipping_zip'
+        ];
+        requiredFields.forEach(selector => {
+            const field = container.querySelector(selector);
+            if (field) {
+                if (isChecked) {
+                    field.setAttribute('required', 'required');
+                } else {
+                    field.removeAttribute('required');
+                }
+            }
+        });
+    },
+
     _onSubmit(ev) {
         this._syncFullName();
 
@@ -63,6 +97,22 @@ publicWidget.registry.UkCheckoutCustom = publicWidget.Widget.extend({
         } else if (postcode) {
             postcode.setCustomValidity('');
             postcode.value = postcodeVal; // Ensure uppercase in the form
+        }
+
+        // Validate shipping postcode if different shipping is checked
+        const useDifferentShipping = this.el.querySelector('#use_different_shipping')?.checked;
+        if (useDifferentShipping) {
+            const shippingZip = this.el.querySelector('#shipping_zip');
+            const shippingZipVal = shippingZip ? shippingZip.value.trim().toUpperCase() : '';
+            if (shippingZip && shippingZipVal && !UK_POSTCODE_REGEX.test(shippingZipVal)) {
+                shippingZip.setCustomValidity('Please enter a valid UK Postal Code for shipping, e.g. SW1A 1AA.');
+                shippingZip.reportValidity();
+                ev.preventDefault();
+                return;
+            } else if (shippingZip) {
+                shippingZip.setCustomValidity('');
+                shippingZip.value = shippingZipVal;
+            }
         }
     },
 });

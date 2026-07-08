@@ -69,4 +69,102 @@
             </div>
         </xpath>
     </template>
+
+    <template id="website_sale_address_shipping_custom" inherit_id="website_sale.address" name="Inline Shipping Address Form">
+        <xpath expr="//t[@t-call='website_sale.address_form_fields']" position="after">
+            <!-- Toggle for shipping address -->
+            <div class="mb-4 form-check uk-shipping-address-toggle-container py-2 border-top border-bottom" t-if="not address_type or address_type == 'billing'">
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="use_different_shipping"
+                       name="use_different_shipping"
+                       t-att-checked="'checked' if order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id else None"/>
+                <label class="form-check-label fw-bold text-primary" for="use_different_shipping">
+                    Ship to a different address
+                </label>
+            </div>
+
+            <!-- Shipping address fields container -->
+            <div id="shipping_address_fields" class="d-none mt-4 p-4 border rounded bg-light" t-if="not address_type or address_type == 'billing'">
+                <h4 class="mb-3 text-secondary border-bottom pb-2">Shipping Address</h4>
+                
+                <!-- Row for First & Last Name -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="col-form-label" for="shipping_first_name">First Name</label>
+                        <input type="text"
+                               name="shipping_first_name"
+                               id="shipping_first_name"
+                               class="form-control"
+                               t-att-value="order.partner_shipping_id.x_first_name if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label" for="shipping_last_name">Last Name</label>
+                        <input type="text"
+                               name="shipping_last_name"
+                               id="shipping_last_name"
+                               class="form-control"
+                               t-att-value="order.partner_shipping_id.x_last_name if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label class="col-form-label" for="shipping_phone">Phone</label>
+                    <input type="tel"
+                           name="shipping_phone"
+                           id="shipping_phone"
+                           class="form-control"
+                           placeholder="e.g. +44 7123 456789 or 07123 456789"
+                           t-att-value="order.partner_shipping_id.phone if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                </div>
+
+                <!-- Street and Number -->
+                <div class="mb-3">
+                    <label class="col-form-label" for="shipping_street">Street and Number</label>
+                    <input type="text"
+                           name="shipping_street"
+                           id="shipping_street"
+                           class="form-control"
+                           t-att-value="order.partner_shipping_id.street if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                </div>
+
+                <!-- Apartment, suite, etc. -->
+                <div class="mb-3">
+                    <label class="col-form-label" for="shipping_street2">Apartment, suite, etc. (optional)</label>
+                    <input type="text"
+                           name="shipping_street2"
+                           id="shipping_street2"
+                           class="form-control"
+                           t-att-value="order.partner_shipping_id.street2 if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                </div>
+
+                <!-- Row for City & Postal Code -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="col-form-label" for="shipping_city">City</label>
+                        <input type="text"
+                               name="shipping_city"
+                               id="shipping_city"
+                               class="form-control"
+                               t-att-value="order.partner_shipping_id.city if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label" for="shipping_zip">Postal Code</label>
+                        <input type="text"
+                               name="shipping_zip"
+                               id="shipping_zip"
+                               class="form-control"
+                               placeholder="e.g. SW1A 1AA"
+                               style="text-transform: uppercase;"
+                               oninput="this.value = this.value.toUpperCase()"
+                               t-att-value="order.partner_shipping_id.zip if (order.partner_shipping_id and order.partner_shipping_id.id != order.partner_id.id) else ''"/>
+                    </div>
+                </div>
+
+                <!-- Hidden Country (Locked to UK) -->
+                <input type="hidden" name="shipping_country_id" t-att-value="request.website.company_id.country_id.id or 233"/>
+            </div>
+        </xpath>
+    </template>
 </odoo>
