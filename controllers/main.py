@@ -99,46 +99,7 @@ class WebsiteSaleCustom(WebsiteSale):
                         if partner.id != public_partner.id:
                             partner.sudo().write(vals)
 
-                    # Process shipping address if we are editing/creating the billing/main address
-                    if not address_type or address_type == 'billing':
-                        use_different_shipping = kw.get('use_different_shipping') == 'on'
-                        if use_different_shipping:
-                            shipping_first_name = (kw.get('shipping_first_name') or '').strip()
-                            shipping_last_name = (kw.get('shipping_last_name') or '').strip()
-                            shipping_phone = (kw.get('shipping_phone') or '').strip()
-                            shipping_street = (kw.get('shipping_street') or '').strip()
-                            shipping_street2 = (kw.get('shipping_street2') or '').strip()
-                            shipping_city = (kw.get('shipping_city') or '').strip()
-                            shipping_zip = (kw.get('shipping_zip') or '').strip().upper()
-                            shipping_country_id = int(kw.get('shipping_country_id') or 0) or order.company_id.country_id.id or 233
 
-                            shipping_vals = {
-                                'x_first_name': shipping_first_name,
-                                'x_last_name': shipping_last_name,
-                                'name': ' '.join(p for p in [shipping_first_name, shipping_last_name] if p).strip() or "Shipping Contact",
-                                'phone': shipping_phone,
-                                'street': shipping_street,
-                                'street2': shipping_street2,
-                                'city': shipping_city,
-                                'zip': shipping_zip,
-                                'country_id': shipping_country_id,
-                                'type': 'delivery',
-                                'parent_id': partner.id,
-                            }
-
-                            # Check if a separate shipping partner already exists on the order
-                            existing_shipping = order.partner_shipping_id
-                            public_partner = request.website.user_id.sudo().partner_id
-                            if existing_shipping and existing_shipping.id != partner.id and existing_shipping.id != public_partner.id:
-                                existing_shipping.sudo().write(shipping_vals)
-                            else:
-                                # Create new child partner for delivery
-                                shipping_partner = request.env['res.partner'].sudo().create(shipping_vals)
-                                order.sudo().write({'partner_shipping_id': shipping_partner.id})
-                        else:
-                            # Ensure shipping is the same as billing
-                            if order.partner_shipping_id and order.partner_shipping_id.id != partner.id:
-                                order.sudo().write({'partner_shipping_id': partner.id})
 
                     # Enqueue and immediately dispatch 'Started Checkout' event to Klaviyo.
                     if order.order_line:
