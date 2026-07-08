@@ -2,10 +2,10 @@
 
     <!-- Enable both billing and shipping addresses by default (Extra Address Step) -->
     <record id="base.group_portal" model="res.groups">
-        <field name="implied_ids" eval="[(4, ref('sale.group_delivery_addresses'))]"/>
+        <field name="implied_ids" eval="[(4, ref('sale.group_delivery_invoice_address'))]"/>
     </record>
     <record id="base.group_public" model="res.groups">
-        <field name="implied_ids" eval="[(4, ref('sale.group_delivery_addresses'))]"/>
+        <field name="implied_ids" eval="[(4, ref('sale.group_delivery_invoice_address'))]"/>
     </record>
 
     <!-- Overwrite old settings view in DB to be empty to clean up the UI -->
