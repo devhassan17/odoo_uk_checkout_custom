@@ -65,6 +65,11 @@ class WebsiteSaleCustom(WebsiteSale):
                 if order:
                     partner_invoice = order.partner_invoice_id
                     partner_shipping = order.partner_shipping_id or order.partner_id
+                    
+                    # Force the main form (Delivery Address) to populate from and reference the shipping partner
+                    response.qcontext['partner'] = partner_shipping
+                    response.qcontext['partner_id'] = partner_shipping.id
+                    
                     if partner_invoice and partner_shipping and partner_invoice.id != partner_shipping.id:
                         response.qcontext['has_different_billing'] = True
                         response.qcontext['billing_partner'] = partner_invoice
