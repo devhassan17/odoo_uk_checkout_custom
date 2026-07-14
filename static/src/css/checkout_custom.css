@@ -39,9 +39,13 @@
 }
 
 /* Inline Billing Form styling */
-#uk_inline_billing_form {
-    border-color: #dee2e6 !important;
+#uk_inline_billing_form,
+#billing_address_container {
+    border: 1px solid #dee2e6 !important;
     background-color: #f8f9fa !important;
+    padding: 1.5rem;
+    border-radius: 0.375rem;
+    margin-top: 1.5rem;
     transition: all 0.3s ease-in-out;
 }
 

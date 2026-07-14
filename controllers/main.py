@@ -57,6 +57,18 @@ class WebsiteSaleCustom(WebsiteSale):
                 else:
                     # If no allowed countries are configured for this company, show all countries
                     pass
+
+            # Detect if a separate billing address is used
+            order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
+            if order:
+                partner_invoice = order.partner_invoice_id
+                partner_shipping = order.partner_shipping_id or order.partner_id
+                if partner_invoice and partner_shipping and partner_invoice.id != partner_shipping.id:
+                    response.qcontext['has_different_billing'] = True
+                    response.qcontext['billing_partner'] = partner_invoice
+                else:
+                    response.qcontext['has_different_billing'] = False
+                    response.qcontext['billing_partner'] = False
         return response
 
     @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)
@@ -67,7 +79,7 @@ class WebsiteSaleCustom(WebsiteSale):
             order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
             if order:
                 address_type = kw.get('address_type')
-                # Determine which partner was just updated or created (this is the billing/main address)
+                # Determine which partner was just updated or created (this is the delivery/main address)
                 partner_id = int(kw.get('partner_id') or 0)
                 if partner_id > 0:
                     partner = request.env['res.partner'].sudo().browse(partner_id)
@@ -99,7 +111,36 @@ class WebsiteSaleCustom(WebsiteSale):
                         if partner.id != public_partner.id:
                             partner.sudo().write(vals)
 
-
+                    # Process billing address if different
+                    billing_different = kw.get('billing_different') in ('on', 'true', '1', 'yes')
+                    if billing_different:
+                        bill_first_name = (kw.get('billing_first_name') or '').strip()
+                        bill_last_name = (kw.get('billing_last_name') or '').strip()
+                        bill_name = ' '.join(p for p in [bill_first_name, bill_last_name] if p).strip()
+                        
+                        billing_vals = {
+                            'parent_id': partner.id,
+                            'type': 'invoice',
+                            'x_first_name': bill_first_name,
+                            'x_last_name': bill_last_name,
+                            'name': bill_name or partner.name,
+                            'street': kw.get('billing_street'),
+                            'street2': kw.get('billing_street2'),
+                            'city': kw.get('billing_city'),
+                            'zip': (kw.get('billing_zip') or '').strip(),
+                            'country_id': int(kw.get('billing_country_id') or 0) or partner.country_id.id,
+                            'phone': kw.get('billing_phone') or partner.phone,
+                        }
+                        
+                        partner_invoice = order.partner_invoice_id
+                        if partner_invoice and partner_invoice.id != partner.id and partner_invoice.parent_id.id == partner.id:
+                            partner_invoice.sudo().write(billing_vals)
+                        else:
+                            partner_invoice = request.env['res.partner'].sudo().create(billing_vals)
+                            order.sudo().write({'partner_invoice_id': partner_invoice.id})
+                    else:
+                        # Reset to main partner
+                        order.sudo().write({'partner_invoice_id': partner.id})
 
                     # Enqueue and immediately dispatch 'Started Checkout' event to Klaviyo.
                     if order.order_line:

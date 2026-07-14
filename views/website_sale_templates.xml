@@ -74,4 +74,113 @@
             </div>
         </xpath>
     </template>
+
+    <template id="website_sale_address_custom" inherit_id="website_sale.address">
+        <xpath expr="//t[@t-call='website_sale.address_form_fields']" position="after">
+            <!-- Checkbox for different billing address -->
+            <div class="mb-3 form-check uk-billing-different-opt mt-4">
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="billing_different"
+                       name="billing_different"
+                       t-att-checked="'checked' if has_different_billing else None"/>
+                <label class="form-check-label fw-bold" for="billing_different">
+                    Billing address is different from delivery address
+                </label>
+            </div>
+
+            <!-- Billing Address Form Container -->
+            <div id="billing_address_container" t-att-style="'' if has_different_billing else 'display: none;'">
+                <h4 class="mt-4 mb-3 border-top pt-3">Billing Address</h4>
+                
+                <div class="row g-3 uk-checkout-name-row">
+                    <div class="col-md-6 mb-2">
+                        <label class="col-form-label" for="billing_first_name">First Name</label>
+                        <input type="text"
+                               name="billing_first_name"
+                               id="billing_first_name"
+                               class="form-control"
+                               t-att-required="'required' if has_different_billing else None"
+                               t-att-value="billing_partner.x_first_name if billing_partner else ''"/>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="col-form-label" for="billing_last_name">Last Name</label>
+                        <input type="text"
+                               name="billing_last_name"
+                               id="billing_last_name"
+                               class="form-control"
+                               t-att-required="'required' if has_different_billing else None"
+                               t-att-value="billing_partner.x_last_name if billing_partner else ''"/>
+                    </div>
+                </div>
+
+                <div class="mb-3" id="div_billing_phone">
+                    <label class="col-form-label" for="billing_phone">Phone</label>
+                    <input type="tel"
+                           name="billing_phone"
+                           id="billing_phone"
+                           class="form-control"
+                           t-att-value="billing_partner.phone if billing_partner else ''"/>
+                </div>
+
+                <div class="mb-3" id="div_billing_street">
+                    <label class="col-form-label" for="billing_street">Street and Number</label>
+                    <input type="text"
+                           name="billing_street"
+                           id="billing_street"
+                           class="form-control"
+                           t-att-required="'required' if has_different_billing else None"
+                           t-att-value="billing_partner.street if billing_partner else ''"
+                           placeholder="Enter a location"/>
+                </div>
+
+                <div class="mb-3" id="div_billing_street2">
+                    <label class="col-form-label" for="billing_street2">Apartment, suite, etc.</label>
+                    <input type="text"
+                           name="billing_street2"
+                           id="billing_street2"
+                           class="form-control"
+                           t-att-value="billing_partner.street2 if billing_partner else ''"/>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3" id="div_billing_city">
+                        <label class="col-form-label" for="billing_city">City</label>
+                        <input type="text"
+                               name="billing_city"
+                               id="billing_city"
+                               class="form-control"
+                               t-att-required="'required' if has_different_billing else None"
+                               t-att-value="billing_partner.city if billing_partner else ''"/>
+                    </div>
+                    <div class="col-md-6 mb-3" id="div_billing_zip">
+                        <label class="col-form-label" for="billing_zip">Postal Code</label>
+                        <input type="text"
+                               name="billing_zip"
+                               id="billing_zip"
+                               class="form-control"
+                               placeholder="e.g. SW1A 1AA"
+                               t-att-required="'required' if has_different_billing else None"
+                               t-att-value="billing_partner.zip if billing_partner else ''"/>
+                    </div>
+                </div>
+
+                <div class="mb-3" id="div_billing_country">
+                    <label class="col-form-label" for="billing_country_id">Country</label>
+                    <select name="billing_country_id"
+                            id="billing_country_id"
+                            class="form-select"
+                            t-att-required="'required' if has_different_billing else None">
+                        <option value="" disabled="disabled">Select a country...</option>
+                        <t t-foreach="countries" t-as="c">
+                            <option t-att-value="c.id"
+                                    t-att-selected="c.id == (billing_partner.country_id.id if billing_partner else country.id)">
+                                <t t-esc="c.name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+            </div>
+        </xpath>
+    </template>
 </odoo>
