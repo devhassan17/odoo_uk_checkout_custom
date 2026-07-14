@@ -64,13 +64,14 @@ class WebsiteSaleCustom(WebsiteSale):
                 order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
                 if order:
                     partner_invoice = order.partner_invoice_id
-                    partner_shipping = order.partner_shipping_id or order.partner_id
+                    main_partner = order.partner_id
                     
-                    # Force the main form (Delivery Address) to populate from and reference the shipping partner
-                    response.qcontext['partner'] = partner_shipping
-                    response.qcontext['partner_id'] = partner_shipping.id
+                    # Force the main form (Delivery Address) to populate from and reference the main partner record.
+                    # This ensures email and user account info synchronize correctly.
+                    response.qcontext['partner'] = main_partner
+                    response.qcontext['partner_id'] = main_partner.id
                     
-                    if partner_invoice and partner_shipping and partner_invoice.id != partner_shipping.id:
+                    if partner_invoice and main_partner and partner_invoice.id != main_partner.id:
                         response.qcontext['has_different_billing'] = True
                         response.qcontext['billing_partner'] = partner_invoice
                     else:
@@ -89,11 +90,8 @@ class WebsiteSaleCustom(WebsiteSale):
         order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
 
         if use_custom_billing and order:
-            # The checkout form's main fields represent the Delivery Address.
-            # Odoo's standard controller updates the partner record set in order.partner_invoice_id.
-            # If partner_invoice_id is currently a separate child billing partner, Odoo would incorrectly
-            # update the billing partner with the delivery address details from the form.
-            # To prevent this, we temporarily point partner_invoice_id back to the main customer partner.
+            # Force standard controller to update the main partner (representing Delivery Address)
+            # by temporarily pointing partner_invoice_id to the main partner.
             main_partner = order.partner_id
             if order.partner_invoice_id and order.partner_invoice_id.id != main_partner.id:
                 order.sudo().write({'partner_invoice_id': main_partner.id})
@@ -102,16 +100,8 @@ class WebsiteSaleCustom(WebsiteSale):
         response = super().shop_address_submit(**kw)
 
         if request.httprequest.method == 'POST' and order:
-            # Determine which partner represents the delivery/main address
-            address_type = kw.get('address_type')
-            partner_id = int(kw.get('partner_id') or 0)
-            if partner_id > 0:
-                partner = request.env['res.partner'].sudo().browse(partner_id)
-            else:
-                if address_type == 'shipping':
-                    partner = order.partner_shipping_id
-                else:
-                    partner = order.partner_id
+            # Determine main partner
+            partner = order.partner_id
 
             if partner and partner.exists():
                 first_name = (kw.get('first_name') or '').strip()
@@ -168,10 +158,16 @@ class WebsiteSaleCustom(WebsiteSale):
                         else:
                             partner_invoice = request.env['res.partner'].sudo().create(billing_vals)
                         
-                        order.sudo().write({'partner_invoice_id': partner_invoice.id})
+                        order.sudo().write({
+                            'partner_invoice_id': partner_invoice.id,
+                            'partner_shipping_id': partner.id
+                        })
                     else:
-                        # Reset to main partner
-                        order.sudo().write({'partner_invoice_id': partner.id})
+                        # Reset both invoice and shipping to main partner
+                        order.sudo().write({
+                            'partner_invoice_id': partner.id,
+                            'partner_shipping_id': partner.id
+                        })
 
                 # Enqueue and immediately dispatch 'Started Checkout' event to Klaviyo.
                 if order.order_line:
