@@ -25,7 +25,7 @@ class WebsiteSaleCustom(WebsiteSale):
             _logger.error("Klaviyo Debug: %s", tb)
             raise UserError("Klaviyo Debug Traceback:\n%s" % tb)
 
-    @http.route(['/shop/cart/update_json'], type='json', auth="public", methods=['POST'], website=True, csrf=False)
+    @http.route(['/shop/cart/update_json'], type='jsonrpc', auth="public", methods=['POST'], website=True, csrf=False)
     def cart_update_json(self, *args, **kwargs):
         try:
             return super().cart_update_json(*args, **kwargs)
@@ -78,95 +78,114 @@ class WebsiteSaleCustom(WebsiteSale):
 
     @http.route(['/shop/address/submit'], type='http', methods=['POST'], auth='public', website=True, sitemap=False)
     def shop_address_submit(self, **kw):
+        company = request.website.company_id or request.env.company
+        use_custom_billing = company and company.x_enable_custom_billing_address
+
+        order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
+
+        if use_custom_billing and order:
+            # The checkout form's main fields represent the Delivery Address.
+            # Odoo's standard controller updates the partner record set in order.partner_invoice_id.
+            # If partner_invoice_id is currently a separate child billing partner, Odoo would incorrectly
+            # update the billing partner with the delivery address details from the form.
+            # To prevent this, we temporarily point partner_invoice_id back to the main customer partner.
+            main_partner = order.partner_id
+            if order.partner_invoice_id and order.partner_invoice_id.id != main_partner.id:
+                order.sudo().write({'partner_invoice_id': main_partner.id})
+
+        # Call super to process the main form values (which will update the delivery/main address)
         response = super().shop_address_submit(**kw)
 
-        if request.httprequest.method == 'POST':
-            order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
-            if order:
-                address_type = kw.get('address_type')
-                # Determine which partner was just updated or created (this is the delivery/main address)
-                partner_id = int(kw.get('partner_id') or 0)
-                if partner_id > 0:
-                    partner = request.env['res.partner'].sudo().browse(partner_id)
+        if request.httprequest.method == 'POST' and order:
+            # Determine which partner represents the delivery/main address
+            address_type = kw.get('address_type')
+            partner_id = int(kw.get('partner_id') or 0)
+            if partner_id > 0:
+                partner = request.env['res.partner'].sudo().browse(partner_id)
+            else:
+                if address_type == 'shipping':
+                    partner = order.partner_shipping_id
                 else:
-                    if address_type == 'shipping':
-                        partner = order.partner_shipping_id
-                    else:
-                        partner = order.partner_invoice_id or order.partner_id
+                    partner = order.partner_id
 
-                if partner and partner.exists():
-                    first_name = (kw.get('first_name') or '').strip()
-                    last_name = (kw.get('last_name') or '').strip()
-                    marketing_opt_in = kw.get('x_marketing_opt_in') in ('on', 'true', '1', 'yes')
+            if partner and partner.exists():
+                first_name = (kw.get('first_name') or '').strip()
+                last_name = (kw.get('last_name') or '').strip()
+                marketing_opt_in = kw.get('x_marketing_opt_in') in ('on', 'true', '1', 'yes')
 
-                    vals = {}
-                    if first_name or last_name:
-                        vals.update({
-                            'x_first_name': first_name,
-                            'x_last_name': last_name,
-                            'name': ' '.join(p for p in [first_name, last_name] if p).strip() or partner.name,
-                        })
-                    # Always store explicit checkbox choice when it is present in the form.
-                    if 'x_marketing_opt_in' in kw or request.httprequest.form.get('x_marketing_opt_in') is not None:
-                        vals['x_marketing_opt_in'] = marketing_opt_in
+                vals = {}
+                if first_name or last_name:
+                    vals.update({
+                        'x_first_name': first_name,
+                        'x_last_name': last_name,
+                        'name': ' '.join(p for p in [first_name, last_name] if p).strip() or partner.name,
+                    })
+                # Always store explicit checkbox choice when it is present in the form.
+                if 'x_marketing_opt_in' in kw or request.httprequest.form.get('x_marketing_opt_in') is not None:
+                    vals['x_marketing_opt_in'] = marketing_opt_in
 
-                    if vals:
-                        # Exclude the public partner to avoid modifying the public user record.
-                        public_partner = request.website.user_id.sudo().partner_id
-                        if partner.id != public_partner.id:
-                            partner.sudo().write(vals)
+                if vals:
+                    # Exclude the public partner to avoid modifying the public user record.
+                    public_partner = request.website.user_id.sudo().partner_id
+                    if partner.id != public_partner.id:
+                        partner.sudo().write(vals)
 
-                    # Process billing address if different (only if enabled for the company)
-                    company = request.website.company_id or request.env.company
-                    if company and company.x_enable_custom_billing_address:
-                        billing_different = kw.get('billing_different') in ('on', 'true', '1', 'yes')
-                        if billing_different:
-                            bill_first_name = (kw.get('billing_first_name') or '').strip()
-                            bill_last_name = (kw.get('billing_last_name') or '').strip()
-                            bill_name = ' '.join(p for p in [bill_first_name, bill_last_name] if p).strip()
-                            
-                            billing_vals = {
-                                'parent_id': partner.id,
-                                'type': 'invoice',
-                                'x_first_name': bill_first_name,
-                                'x_last_name': bill_last_name,
-                                'name': bill_name or partner.name,
-                                'street': kw.get('billing_street'),
-                                'street2': kw.get('billing_street2'),
-                                'city': kw.get('billing_city'),
-                                'zip': (kw.get('billing_zip') or '').strip(),
-                                'country_id': int(kw.get('billing_country_id') or 0) or partner.country_id.id,
-                                'phone': kw.get('billing_phone') or partner.phone,
-                            }
-                            
-                            partner_invoice = order.partner_invoice_id
-                            if partner_invoice and partner_invoice.id != partner.id and partner_invoice.parent_id.id == partner.id:
-                                partner_invoice.sudo().write(billing_vals)
-                            else:
-                                partner_invoice = request.env['res.partner'].sudo().create(billing_vals)
-                                order.sudo().write({'partner_invoice_id': partner_invoice.id})
+                # Process billing address if different (only if enabled for the company)
+                if use_custom_billing:
+                    billing_different = kw.get('billing_different') in ('on', 'true', '1', 'yes')
+                    if billing_different:
+                        bill_first_name = (kw.get('billing_first_name') or '').strip()
+                        bill_last_name = (kw.get('billing_last_name') or '').strip()
+                        bill_name = ' '.join(p for p in [bill_first_name, bill_last_name] if p).strip()
+                        
+                        billing_vals = {
+                            'parent_id': partner.id,
+                            'type': 'invoice',
+                            'x_first_name': bill_first_name,
+                            'x_last_name': bill_last_name,
+                            'name': bill_name or partner.name,
+                            'street': kw.get('billing_street'),
+                            'street2': kw.get('billing_street2'),
+                            'city': kw.get('billing_city'),
+                            'zip': (kw.get('billing_zip') or '').strip(),
+                            'country_id': int(kw.get('billing_country_id') or 0) or partner.country_id.id,
+                            'phone': kw.get('billing_phone') or partner.phone,
+                        }
+                        
+                        # Search for an existing child invoice partner of this partner
+                        partner_invoice = request.env['res.partner'].sudo().search([
+                            ('parent_id', '=', partner.id),
+                            ('type', '=', 'invoice')
+                        ], limit=1)
+                        
+                        if partner_invoice:
+                            partner_invoice.sudo().write(billing_vals)
                         else:
-                            # Reset to main partner
-                            order.sudo().write({'partner_invoice_id': partner.id})
+                            partner_invoice = request.env['res.partner'].sudo().create(billing_vals)
+                        
+                        order.sudo().write({'partner_invoice_id': partner_invoice.id})
+                    else:
+                        # Reset to main partner
+                        order.sudo().write({'partner_invoice_id': partner.id})
 
-                    # Enqueue and immediately dispatch 'Started Checkout' event to Klaviyo.
-                    if order.order_line:
-                        event_queue_model = request.env.get('fpg.odoo.klaviyo.integration.event.queue')
-                        if event_queue_model is not None:
-                            event_queue = event_queue_model.sudo()
-                            existing_checkout = event_queue.search([
-                                ('order_id', '=', order.id),
-                                ('event_type', '=', 'started_checkout')
-                            ], limit=1)
-                            if not existing_checkout:
-                                try:
-                                    with request.env.cr.savepoint():
-                                        new_event = event_queue.create({
-                                            'order_id': order.id,
-                                            'event_type': 'started_checkout',
-                                        })
-                                        new_event.send_event()
-                                except Exception as e:
-                                    _logger.exception("Klaviyo: Failed to create or send Started Checkout event: %s", e)
+                # Enqueue and immediately dispatch 'Started Checkout' event to Klaviyo.
+                if order.order_line:
+                    event_queue_model = request.env.get('fpg.odoo.klaviyo.integration.event.queue')
+                    if event_queue_model is not None:
+                        event_queue = event_queue_model.sudo()
+                        existing_checkout = event_queue.search([
+                            ('order_id', '=', order.id),
+                            ('event_type', '=', 'started_checkout')
+                        ], limit=1)
+                        if not existing_checkout:
+                            try:
+                                with request.env.cr.savepoint():
+                                    new_event = event_queue.create({
+                                        'order_id': order.id,
+                                        'event_type': 'started_checkout',
+                                    })
+                                    new_event.send_event()
+                            except Exception as e:
+                                _logger.exception("Klaviyo: Failed to create or send Started Checkout event: %s", e)
 
         return response

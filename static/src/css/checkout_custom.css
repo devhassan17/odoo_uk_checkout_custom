@@ -62,3 +62,12 @@ label[for="use_same"],
 .form-switch:has(input[name="use_delivery_as_billing"]) {
     display: none !important;
 }
+
+/* Conditionally hide billing address section on checkout page based on company settings class */
+.o_hide_billing_address #billing_address_list,
+.o_hide_billing_address [id*="billing_address_list"],
+.o_hide_billing_address .o_address_card[data-address-type="billing"],
+.o_hide_billing_address [name="billing_address_title"],
+.o_hide_billing_address .js_change_billing {
+    display: none !important;
+}

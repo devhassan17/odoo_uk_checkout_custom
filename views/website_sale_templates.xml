@@ -187,10 +187,8 @@
     </template>
 
     <template id="website_sale_checkout_custom" inherit_id="website_sale.checkout">
-        <xpath expr="//t[@t-call='website_sale.billing_address_row']" position="replace">
-            <t t-if="not website.company_id.x_enable_custom_billing_address">
-                <t t-call="website_sale.billing_address_row"/>
-            </t>
+        <xpath expr="//div[@id='shop_checkout']" position="attributes">
+            <attribute name="t-att-class">'o_hide_billing_address' if website.company_id.x_enable_custom_billing_address else ''</attribute>
         </xpath>
     </template>
 </odoo>
