@@ -75,7 +75,7 @@
         </xpath>
 
         <!-- 8. Insert "Shipping Address" heading above Street and Number field -->
-        <xpath expr="//div[contains(@class, 'div_street')]" position="before">
+        <xpath expr="//input[@name='street']/parent::div" position="before">
             <div class="w-100 mt-4 mb-3 uk-shipping-address-title text-uppercase fw-bold text-muted" style="font-size: 0.85rem; letter-spacing: 0.1em; border-bottom: 1px solid #dee2e6; padding-bottom: 0.5rem;">SHIPPING ADDRESS</div>
         </xpath>
     </template>
