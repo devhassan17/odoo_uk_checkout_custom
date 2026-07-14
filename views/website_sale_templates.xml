@@ -183,4 +183,10 @@
             </div>
         </xpath>
     </template>
+
+    <template id="website_sale_checkout_custom" inherit_id="website_sale.checkout">
+        <xpath expr="//t[@t-call='website_sale.billing_address_row']" position="replace">
+            <!-- Removed Billing Address section since it is configured on /shop/address -->
+        </xpath>
+    </template>
 </odoo>
