@@ -22,7 +22,6 @@
             <list string="Company Checkout Filters" create="false" delete="false">
                 <field name="name"/>
                 <field name="x_checkout_country_ids" widget="many2many_tags"/>
-                <field name="x_enable_custom_billing_address" widget="boolean_toggle"/>
             </list>
         </field>
     </record>
@@ -42,9 +41,6 @@
                     <group>
                         <group>
                             <field name="x_checkout_country_ids" widget="many2many_tags" placeholder="Select allowed countries..."/>
-                        </group>
-                        <group>
-                            <field name="x_enable_custom_billing_address"/>
                         </group>
                     </group>
                 </sheet>

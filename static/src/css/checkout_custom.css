@@ -38,36 +38,4 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* Inline Billing Form styling */
-#uk_inline_billing_form,
-#billing_address_container {
-    border: 1px solid #dee2e6 !important;
-    background-color: #f8f9fa !important;
-    padding: 1.5rem;
-    border-radius: 0.375rem;
-    margin-top: 1.5rem;
-    transition: all 0.3s ease-in-out;
-}
 
-/* Hide "Same as delivery address" switch on checkout */
-#use_same, 
-label[for="use_same"],
-.form-check:has(#use_same),
-.form-switch:has(#use_same),
-.form-check:has(input[name="use_same"]),
-.form-switch:has(input[name="use_same"]),
-.form-check:has(input[name="use_billing"]),
-.form-switch:has(input[name="use_billing"]),
-.form-check:has(input[name="use_delivery_as_billing"]),
-.form-switch:has(input[name="use_delivery_as_billing"]) {
-    display: none !important;
-}
-
-/* Conditionally hide billing address section on checkout page based on company settings class */
-.o_hide_billing_address #billing_address_list,
-.o_hide_billing_address [id*="billing_address_list"],
-.o_hide_billing_address .o_address_card[data-address-type="billing"],
-.o_hide_billing_address [name="billing_address_title"],
-.o_hide_billing_address .js_change_billing {
-    display: none !important;
-}
