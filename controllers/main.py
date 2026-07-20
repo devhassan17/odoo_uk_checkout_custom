@@ -15,36 +15,73 @@ class WebsiteSaleCustom(WebsiteSale):
     frontend.
     """
 
+    def _get_cart_order(self, force_create=False):
+        """Safely retrieve or create the cart order across Odoo versions."""
+        order = getattr(request, 'cart', None)
+        if order:
+            return order
+        if hasattr(self, '_get_search_order'):
+            try:
+                order = self._get_search_order(force_create=force_create)
+                if order:
+                    return order
+            except Exception:
+                pass
+        if hasattr(request, 'website') and hasattr(request.website, 'sale_get_order'):
+            try:
+                order = request.website.sale_get_order(force_create=force_create)
+                if order:
+                    return order
+            except Exception:
+                pass
+        so_id = request.session.get('sale_order_id')
+        if so_id:
+            order = request.env['sale.order'].sudo().browse(so_id).exists()
+            if order and order.state == 'draft':
+                return order
+        if force_create:
+            partner = request.env.user.partner_id
+            website = getattr(request, 'website', None) or (request.env['website'].get_current_website() if hasattr(request.env.get('website'), 'get_current_website') else False)
+            company = getattr(website, 'company_id', None) or request.env.company
+            order = request.env['sale.order'].sudo().create({
+                'partner_id': partner.id,
+                'website_id': website.id if website else False,
+                'company_id': company.id if company else False,
+            })
+            request.session['sale_order_id'] = order.id
+            return order
+        return request.env['sale.order']
+
     @http.route(['/shop/cart/update'], type='http', auth="public", methods=['POST'], website=True, csrf=False)
-    def cart_update(self, *args, **kwargs):
+    def cart_update(self, product_id=None, add_qty=1, set_qty=0, line_id=None, **kw):
         try:
             if hasattr(super(), 'cart_update'):
-                return super().cart_update(*args, **kwargs)
+                return super().cart_update(product_id=product_id, add_qty=add_qty, set_qty=set_qty, line_id=line_id, **kw)
 
-            # Fallback for Odoo versions where WebsiteSale does not have cart_update method
-            product_id = kwargs.get('product_id') or (args[0] if args else None)
-            add_qty = kwargs.get('add_qty', 1)
-            set_qty = kwargs.get('set_qty', 0)
-            line_id = kwargs.get('line_id')
+            # In Odoo 17+, website_sale uses cart_update_json for cart modifications
+            p_id = int(product_id) if product_id else None
+            a_qty = float(add_qty) if add_qty is not None else None
+            s_qty = float(set_qty) if set_qty is not None and float(set_qty) != 0 else None
+            l_id = int(line_id) if line_id else None
 
-            order = request.website.sale_get_order(force_create=True)
-            if order and order.state != 'draft':
-                request.session['sale_order_id'] = None
-                order = request.website.sale_get_order(force_create=True)
+            if hasattr(super(), 'cart_update_json'):
+                super().cart_update_json(product_id=p_id, add_qty=a_qty, set_qty=s_qty, line_id=l_id, **kw)
+            elif hasattr(self, 'cart_update_json'):
+                self.cart_update_json(product_id=p_id, add_qty=a_qty, set_qty=s_qty, line_id=l_id, **kw)
+            else:
+                order = self._get_cart_order(force_create=True)
+                if order and order.state != 'draft':
+                    request.session['sale_order_id'] = None
+                    order = self._get_cart_order(force_create=True)
+                if order and p_id:
+                    order._cart_update(
+                        product_id=p_id,
+                        line_id=l_id,
+                        add_qty=a_qty or 1.0,
+                        set_qty=s_qty or 0.0,
+                    )
 
-            if order and product_id:
-                product_id = int(product_id)
-                add_qty = float(add_qty) if add_qty is not None else 1.0
-                set_qty = float(set_qty) if set_qty is not None else 0.0
-                line_id = int(line_id) if line_id else None
-                order._cart_update(
-                    product_id=product_id,
-                    line_id=line_id,
-                    add_qty=add_qty,
-                    set_qty=set_qty,
-                )
-
-            if kwargs.get('express'):
+            if kw.get('express'):
                 return request.redirect('/shop/checkout?express=1')
             return request.redirect('/shop/cart')
         except Exception as e:
@@ -101,7 +138,7 @@ class WebsiteSaleCustom(WebsiteSale):
             raise
 
         try:
-            order = getattr(request, 'cart', None) or (request.website.sale_get_order() if hasattr(request.website, 'sale_get_order') else None)
+            order = self._get_cart_order(force_create=False)
             if request.httprequest.method == 'POST' and order:
                 partner = order.partner_id
                 if partner and partner.exists():
