@@ -64,28 +64,53 @@ class WebsiteSaleCustom(WebsiteSale):
             s_qty = float(set_qty) if set_qty is not None and float(set_qty) != 0 else None
             l_id = int(line_id) if line_id else None
 
+            res_json = {}
             if hasattr(super(), 'cart_update_json'):
-                super().cart_update_json(product_id=p_id, add_qty=a_qty, set_qty=s_qty, line_id=l_id, **kw)
+                res_json = super().cart_update_json(product_id=p_id, add_qty=a_qty, set_qty=s_qty, line_id=l_id, **kw) or {}
             elif hasattr(self, 'cart_update_json'):
-                self.cart_update_json(product_id=p_id, add_qty=a_qty, set_qty=s_qty, line_id=l_id, **kw)
+                res_json = self.cart_update_json(product_id=p_id, add_qty=a_qty, set_qty=s_qty, line_id=l_id, **kw) or {}
             else:
                 order = self._get_cart_order(force_create=True)
                 if order and order.state != 'draft':
                     request.session['sale_order_id'] = None
                     order = self._get_cart_order(force_create=True)
                 if order and p_id:
-                    order._cart_update(
+                    values = order._cart_update(
                         product_id=p_id,
                         line_id=l_id,
                         add_qty=a_qty or 1.0,
                         set_qty=s_qty or 0.0,
                     )
+                    res_json = {'cart_quantity': order.cart_quantity, 'quantity': values.get('quantity', 0)}
+
+            is_ajax = (
+                request.httprequest.headers.get('X-Requested-With') == 'XMLHttpRequest'
+                or 'application/json' in request.httprequest.headers.get('Accept', '')
+                or request.httprequest.is_json
+            )
+            if is_ajax:
+                import json
+                return request.make_response(
+                    json.dumps(res_json if isinstance(res_json, dict) else {}),
+                    headers=[('Content-Type', 'application/json')]
+                )
 
             if kw.get('express'):
                 return request.redirect('/shop/checkout?express=1')
             return request.redirect('/shop/cart')
         except Exception as e:
             _logger.exception("Error in cart_update: %s", e)
+            is_ajax = (
+                request.httprequest.headers.get('X-Requested-With') == 'XMLHttpRequest'
+                or 'application/json' in request.httprequest.headers.get('Accept', '')
+                or request.httprequest.is_json
+            )
+            if is_ajax:
+                import json
+                return request.make_response(
+                    json.dumps({'error': str(e)}),
+                    headers=[('Content-Type', 'application/json')]
+                )
             return request.redirect('/shop/cart')
 
     @http.route(['/shop/cart/update_json'], type='jsonrpc', auth="public", methods=['POST'], website=True, csrf=False)
